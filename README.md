@@ -1,1 +1,1 @@
-Meus Projetos Python.
+Meus projeto Python.
