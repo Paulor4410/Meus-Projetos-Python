@@ -1,44 +1,47 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
 
-# Criando um DataFrame com dados fictícios
+# Dados fictícios
 data = {
-    'sabe_fazer_contas': [1, 1, 0, 1, 0, 1, 1, 0, 0, 1],
-    'gosta_de_jogar': [1, 1, 0, 1, 1, 0, 0, 1, 1, 0],
-    'tem_telefone': [1, 1, 1, 0, 0, 1, 1, 0, 0, 1],
-    'idade': [10, 12, 8, 15, 6, 14, 13, 9, 7, 16]
+    'anos_estudo': [10, 15, 12, 20, 8, 18, 10, 22, 6, 14, 9, 16, 12, 17, 14],
+    'experiencia_trabalho': [2, 10, 5, 15, 1, 12, 3, 20, 0, 9, 2, 11, 4, 10, 7],
+    'num_filhos': [0, 2, 1, 3, 0, 1, 0, 2, 0, 1, 0, 3, 1, 2, 1],
+    'anos_casado': [0, 5, 2, 10, 0, 8, 0, 15, 0, 3, 0, 10, 1, 6, 4],
+    'nivel_educacional': [1, 3, 2, 4, 1, 3, 1, 5, 1, 3, 2, 4, 2, 4, 3],
+    'idade': [18, 35, 25, 45, 22, 40, 19, 50, 16, 30, 20, 42, 26, 36, 29]
 }
-
 df = pd.DataFrame(data)
 
-# Dividindo os dados em features e target
-X = df[['sabe_fazer_contas', 'gosta_de_jogar', 'tem_telefone']]
+# Separando dados de treino e teste
+X = df.drop('idade', axis=1)
 y = df['idade']
-
-# Dividindo em conjuntos de treino e teste
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Inicializando o modelo
-model = LinearRegression()
-
-# Treinando o modelo
+# Criando e treinando o modelo
+model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
-def predict_age():
-    print("Responda às seguintes perguntas com 1 (Sim) ou 0 (Não):")
+# Avaliando o modelo
+y_pred = model.predict(X_test)
+mae = mean_absolute_error(y_test, y_pred)
+print(f"Erro médio absoluto (MAE): {mae}")
 
-    sabe_fazer_contas = int(input("Você sabe fazer contas? "))
-    gosta_de_jogar = int(input("Você gosta de jogar? "))
-    tem_telefone = int(input("Você tem um telefone? "))
+# Função de previsão de idade
+def prever_idade():
+    print("Responda às perguntas abaixo para prever a idade.")
+    anos_estudo = int(input("Quantos anos você estudou? "))
+    experiencia_trabalho = int(input("Quantos anos você tem de experiência de trabalho? "))
+    num_filhos = int(input("Quantos filhos você tem? "))
+    anos_casado = int(input("Quantos anos você está casado(a)? "))
+    nivel_educacional = int(input("Qual é o seu nível educacional? (1=Fundamental, 2=Médio, 3=Superior, 4=Pós-graduação, 5=Doutorado) "))
 
-    # Criando um array com as respostas
-    user_input = [[sabe_fazer_contas, gosta_de_jogar, tem_telefone]]
+    dados_usuario = pd.DataFrame([[anos_estudo, experiencia_trabalho, num_filhos, anos_casado, nivel_educacional]],
+    columns=['anos_estudo', 'experiencia_trabalho', 'num_filhos', 'anos_casado', 'nivel_educacional'])
 
-    # Fazendo a previsão
-    predicted_age = model.predict(user_input)
-    print(f"Sua idade estimada é: {predicted_age[0]:.2f} anos.")
+    idade_prevista = model.predict(dados_usuario)
+    print(f"A idade prevista é: {idade_prevista[0]:.1f} anos.")
 
-# Chamar a função para prever a idade
-if __name__ == "__main__":
-    predict_age()
+# Executar previsão
+prever_idade()
